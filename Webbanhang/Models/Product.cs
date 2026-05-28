@@ -24,8 +24,8 @@ namespace Webbanhang.Models
         [Range(0, 100000000, ErrorMessage = "Giá cũ không hợp lệ")]
         public decimal? OldPrice { get; set; }
 
-        [Required(ErrorMessage = "Vui lòng nhập đường dẫn hình ảnh")]
-        [StringLength(500, ErrorMessage = "Đường dẫn hình ảnh tối đa 500 ký tự")]
+        [Required(ErrorMessage = "Vui lòng thêm hình ảnh sản phẩm")]
+        [StringLength(6000000, ErrorMessage = "Dung lượng hình ảnh quá lớn")]
         public string ImageUrl { get; set; } = string.Empty;
 
         [StringLength(30, ErrorMessage = "Nhãn hiển thị tối đa 30 ký tự")]

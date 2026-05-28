@@ -65,10 +65,19 @@
 
             <div class="form-grid-two">
                 <div class="form-group-custom">
-                    <label asp-for="ImageUrl">Đường dẫn hình ảnh</label>
-                    <input asp-for="ImageUrl" class="form-control" placeholder="https://images.unsplash.com/photo-..." />
+                    <label asp-for="ImageUrl">Hình ảnh sản phẩm</label>
+                    <input asp-for="ImageUrl" type="hidden" class="js-image-value" />
+                    <div class="image-paste-box js-image-paste-box" tabindex="0">
+                        <img class="image-paste-preview js-image-preview" src="@Model.ImageUrl" alt="Xem trước hình ảnh sản phẩm" />
+                        <div class="image-paste-content">
+                            <strong>Dán hình ảnh vào đây</strong>
+                            <span>Copy ảnh rồi nhấn Ctrl + V, hoặc chọn ảnh từ máy.</span>
+                            <button class="btn btn-outline-custom image-file-btn" type="button">Chọn ảnh</button>
+                            <input class="js-image-file visually-hidden" type="file" accept="image/*" />
+                        </div>
+                    </div>
                     <span asp-validation-for="ImageUrl" class="text-danger"></span>
-                    <small>Dán link ảnh thật từ Unsplash/Pexels hoặc link ảnh sản phẩm online. Ví dụ: https://images.unsplash.com/photo-...</small>
+                    <small>Ảnh được lưu trực tiếp vào sản phẩm, không cần nhập link https.</small>
                 </div>
 
                 <div class="form-group-custom">

@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const autoDismissDelay = 3000;
     const alerts = document.querySelectorAll(".alert");
     const vndInputs = document.querySelectorAll(".js-vnd-input");
+    const imagePasteBoxes = document.querySelectorAll(".js-image-paste-box");
 
     alerts.forEach((alert) => {
         const closeButton = alert.querySelector(".alert-close");
@@ -33,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
             input.value = getVndDigits(input.value);
         }, true);
     });
+
+    imagePasteBoxes.forEach((box) => setupImagePasteBox(box));
 
     const addToCartForms = document.querySelectorAll(".add-cart-form, .detail-cart-form");
     addToCartForms.forEach((form) => {
@@ -110,6 +113,53 @@ const moveCaretBeforeVnd = (input) => {
         const caretPosition = suffixStart === -1 ? input.value.length : suffixStart;
         input.setSelectionRange(caretPosition, caretPosition);
     });
+};
+
+const setupImagePasteBox = (box) => {
+    const form = box.closest("form");
+    const imageValue = form?.querySelector(".js-image-value");
+    const preview = box.querySelector(".js-image-preview");
+    const fileInput = box.querySelector(".js-image-file");
+    const fileButton = box.querySelector(".image-file-btn");
+
+    if (!imageValue || !preview) {
+        return;
+    }
+
+    const setImage = (file) => {
+        if (!file?.type?.startsWith("image/")) {
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+            imageValue.value = reader.result;
+            preview.src = reader.result;
+
+            const editPreviewImage = document.querySelector(".js-edit-preview-image");
+            if (editPreviewImage) {
+                editPreviewImage.src = reader.result;
+            }
+
+            box.classList.add("has-image");
+        });
+        reader.readAsDataURL(file);
+    };
+
+    box.addEventListener("paste", (event) => {
+        const imageFile = Array.from(event.clipboardData?.files ?? [])
+            .find((file) => file.type.startsWith("image/"));
+
+        if (imageFile) {
+            event.preventDefault();
+            setImage(imageFile);
+        }
+    });
+
+    box.addEventListener("click", () => box.focus());
+
+    fileButton?.addEventListener("click", () => fileInput?.click());
+    fileInput?.addEventListener("change", () => setImage(fileInput.files?.[0]));
 };
 
 window.addEventListener("beforeunload", () => {
