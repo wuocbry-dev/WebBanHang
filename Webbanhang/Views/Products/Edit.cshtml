@@ -48,13 +48,13 @@
             <div class="form-grid-two">
                 <div class="form-group-custom">
                     <label asp-for="Price">Giá bán</label>
-                    <input asp-for="Price" class="form-control js-vnd-input" type="text" inputmode="numeric" autocomplete="off" min="1000" step="1000" />
+                    <input id="Price" name="Price" value="@Model.Price.ToString("0")" class="form-control js-vnd-input" type="text" inputmode="numeric" autocomplete="off" data-vnd-min="1000" data-vnd-max="1000000000" required data-val="false" />
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
 
                 <div class="form-group-custom">
                     <label asp-for="OldPrice">Giá cũ</label>
-                    <input asp-for="OldPrice" class="form-control js-vnd-input" type="text" inputmode="numeric" autocomplete="off" min="0" step="1000" />
+                    <input id="OldPrice" name="OldPrice" value="@(Model.OldPrice.HasValue ? Model.OldPrice.Value.ToString("0") : "")" class="form-control js-vnd-input" type="text" inputmode="numeric" autocomplete="off" data-vnd-min="0" data-vnd-max="1000000000" data-val="false" />
                     <span asp-validation-for="OldPrice" class="text-danger"></span>
                 </div>
             </div>

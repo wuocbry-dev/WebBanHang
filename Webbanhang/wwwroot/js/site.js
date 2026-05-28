@@ -25,12 +25,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     vndInputs.forEach((input) => {
         formatVndInput(input);
+        validateVndInput(input);
 
-        input.addEventListener("input", () => formatVndInput(input));
+        input.addEventListener("input", () => {
+            formatVndInput(input);
+            validateVndInput(input);
+        });
+        input.addEventListener("blur", () => validateVndInput(input));
         input.addEventListener("focus", () => moveCaretBeforeVnd(input));
         input.addEventListener("click", () => moveCaretBeforeVnd(input));
 
-        input.form?.addEventListener("submit", () => {
+        input.form?.addEventListener("submit", (event) => {
+            const formVndInputs = input.form.querySelectorAll(".js-vnd-input");
+            const isInvalid = Array.from(formVndInputs).some((field) => !validateVndInput(field));
+
+            if (isInvalid) {
+                event.preventDefault();
+                input.form.reportValidity();
+                return;
+            }
+
             input.value = getVndDigits(input.value);
         }, true);
     });
@@ -105,6 +119,36 @@ const formatVndInput = (input) => {
     const digits = getVndDigits(input.value);
     input.value = digits ? `${Number.parseInt(digits, 10).toLocaleString("en-US")} VND` : "";
     moveCaretBeforeVnd(input);
+};
+
+const validateVndInput = (input) => {
+    const digits = getVndDigits(input.value);
+    const value = digits ? Number.parseInt(digits, 10) : null;
+    const min = input.dataset.vndMin ? Number.parseInt(input.dataset.vndMin, 10) : null;
+    const max = input.dataset.vndMax ? Number.parseInt(input.dataset.vndMax, 10) : null;
+
+    input.setCustomValidity("");
+
+    if (input.required && value === null) {
+        input.setCustomValidity("Vui lòng nhập giá bán.");
+        return false;
+    }
+
+    if (value === null) {
+        return true;
+    }
+
+    if (min !== null && value < min) {
+        input.setCustomValidity(`Giá bán phải từ ${min.toLocaleString("en-US")} VND trở lên.`);
+        return false;
+    }
+
+    if (max !== null && value > max) {
+        input.setCustomValidity(`Giá bán không được vượt quá ${max.toLocaleString("en-US")} VND.`);
+        return false;
+    }
+
+    return true;
 };
 
 const moveCaretBeforeVnd = (input) => {

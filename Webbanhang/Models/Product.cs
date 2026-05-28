@@ -18,10 +18,10 @@ namespace Webbanhang.Models
         [StringLength(500, ErrorMessage = "Mô tả tối đa 500 ký tự")]
         public string Description { get; set; } = string.Empty;
 
-        [Range(1000, 100000000, ErrorMessage = "Giá bán phải từ 1.000đ trở lên")]
+        [Range(1000, 1000000000, ErrorMessage = "Giá bán phải từ 1,000 VND đến 1,000,000,000 VND")]
         public decimal Price { get; set; }
 
-        [Range(0, 100000000, ErrorMessage = "Giá cũ không hợp lệ")]
+        [Range(0, 1000000000, ErrorMessage = "Giá cũ không được vượt quá 1,000,000,000 VND")]
         public decimal? OldPrice { get; set; }
 
         [Required(ErrorMessage = "Vui lòng thêm hình ảnh sản phẩm")]
