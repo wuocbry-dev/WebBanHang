@@ -48,13 +48,13 @@
             <div class="form-grid-two">
                 <div class="form-group-custom">
                     <label asp-for="Price">Giá bán</label>
-                    <input asp-for="Price" class="form-control" type="number" min="1000" step="1000" />
+                    <input asp-for="Price" class="form-control js-vnd-input" type="text" inputmode="numeric" autocomplete="off" min="1000" step="1000" />
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
 
                 <div class="form-group-custom">
                     <label asp-for="OldPrice">Giá cũ</label>
-                    <input asp-for="OldPrice" class="form-control" type="number" min="0" step="1000" />
+                    <input asp-for="OldPrice" class="form-control js-vnd-input" type="text" inputmode="numeric" autocomplete="off" min="0" step="1000" />
                     <span asp-validation-for="OldPrice" class="text-danger"></span>
                 </div>
             </div>

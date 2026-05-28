@@ -5,6 +5,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const autoDismissDelay = 3000;
     const alerts = document.querySelectorAll(".alert");
+    const vndInputs = document.querySelectorAll(".js-vnd-input");
 
     alerts.forEach((alert) => {
         const closeButton = alert.querySelector(".alert-close");
@@ -20,6 +21,18 @@ document.addEventListener("DOMContentLoaded", () => {
         window.scrollTo(0, Number.parseInt(savedScrollPosition, 10));
         sessionStorage.removeItem("scrollPosition");
     }
+
+    vndInputs.forEach((input) => {
+        formatVndInput(input);
+
+        input.addEventListener("input", () => formatVndInput(input));
+        input.addEventListener("focus", () => moveCaretBeforeVnd(input));
+        input.addEventListener("click", () => moveCaretBeforeVnd(input));
+
+        input.form?.addEventListener("submit", () => {
+            input.value = getVndDigits(input.value);
+        }, true);
+    });
 
     const addToCartForms = document.querySelectorAll(".add-cart-form, .detail-cart-form");
     addToCartForms.forEach((form) => {
@@ -74,6 +87,29 @@ const dismissAlert = (alert) => {
 
     alert.addEventListener("transitionend", removeAlert, { once: true });
     window.setTimeout(removeAlert, 250);
+};
+
+const getVndDigits = (value) => {
+    const currencyValue = value.replace(/\s*VND\s*$/i, "").trim();
+    const wholeNumber = currencyValue.includes(".") && !currencyValue.includes(",")
+        ? currencyValue.split(".")[0]
+        : currencyValue;
+
+    return wholeNumber.replace(/\D/g, "");
+};
+
+const formatVndInput = (input) => {
+    const digits = getVndDigits(input.value);
+    input.value = digits ? `${Number.parseInt(digits, 10).toLocaleString("en-US")} VND` : "";
+    moveCaretBeforeVnd(input);
+};
+
+const moveCaretBeforeVnd = (input) => {
+    window.requestAnimationFrame(() => {
+        const suffixStart = input.value.indexOf(" VND");
+        const caretPosition = suffixStart === -1 ? input.value.length : suffixStart;
+        input.setSelectionRange(caretPosition, caretPosition);
+    });
 };
 
 window.addEventListener("beforeunload", () => {

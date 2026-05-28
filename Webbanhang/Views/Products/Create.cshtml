@@ -39,8 +39,10 @@
                 <div class="form-group-custom">
                     <label asp-for="Price">Giá bán</label>
                     <input asp-for="Price"
-                           class="form-control"
-                           type="number"
+                           class="form-control js-vnd-input"
+                           type="text"
+                           inputmode="numeric"
+                           autocomplete="off"
                            min="1000"
                            max="100000"
                            step="1000" />
@@ -50,8 +52,10 @@
                 <div class="form-group-custom">
                     <label asp-for="OldPrice">Giá cũ</label>
                     <input asp-for="OldPrice"
-                           class="form-control"
-                           type="number"
+                           class="form-control js-vnd-input"
+                           type="text"
+                           inputmode="numeric"
+                           autocomplete="off"
                            min="0"
                            max="100000"
                            step="1000" />
