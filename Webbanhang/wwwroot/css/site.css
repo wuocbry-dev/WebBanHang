@@ -68,7 +68,6 @@ button,
 .action-btn,
 .btn-icon,
 .qty-btn,
-.qty-save,
 .remove-btn {
   will-change: transform;
 }
@@ -1236,7 +1235,7 @@ img {
   border: 1px solid var(--border);
   border-radius: 18px;
   background: #f9fafb;
-  min-width: 220px;
+  min-width: 144px;
   min-height: 50px;
   justify-content: center;
 }
@@ -1246,7 +1245,6 @@ img {
 }
 
 .qty-btn,
-.qty-save,
 .remove-btn {
   border: 0;
   font-weight: 900;
@@ -1264,19 +1262,16 @@ img {
 }
 
 .qty-btn:hover,
-.qty-save:hover,
 .remove-btn:hover {
   box-shadow: inset 0 0 0 999px rgba(255, 255, 255, 0.16);
 }
 
 .qty-btn:active,
-.qty-save:active,
 .remove-btn:active {
   box-shadow: inset 0 0 0 999px rgba(17, 24, 39, 0.05);
 }
 
 .qty-btn:disabled,
-.qty-save:disabled,
 .remove-btn:disabled {
   opacity: 0.62;
   cursor: wait;
@@ -1302,16 +1297,6 @@ img {
 .cart-qty-input::-webkit-inner-spin-button {
   margin: 0;
   appearance: none;
-}
-
-.qty-save {
-  height: 36px;
-  min-width: 78px;
-  padding: 0 10px;
-  border-radius: 12px;
-  color: #fff;
-  background: var(--dark);
-  font-size: 0.78rem;
 }
 
 .cart-line-total span {

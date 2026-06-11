@@ -14,7 +14,9 @@
                 <span class="eyebrow dark"><i class="fa-solid fa-cart-shopping"></i> Giỏ hàng</span>
                 <h1>Giỏ hàng của bạn</h1>
             </div>
-            <a class="btn btn-outline-custom" asp-controller="Home" asp-action="Index" asp-fragment="san-pham"><i class="fa-solid fa-arrow-left me-1"></i> Tiếp tục mua sắm</a>
+            <a class="btn btn-outline-custom" asp-controller="Home" asp-action="Index" asp-fragment="san-pham">
+                <i class="fa-solid fa-arrow-left me-1"></i> Tiếp tục mua sắm
+            </a>
         </div>
 
         @if (TempData["CartMessage"] != null)
@@ -57,20 +59,23 @@
                                 <form asp-controller="Cart" asp-action="Decrease" method="post" class="js-cart-action-form">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@item.ProductId" />
-                                    <button class="qty-btn" type="submit" aria-label="Giảm số lượng"><i class="fa-solid fa-minus"></i></button>
+                                    <button class="qty-btn" type="submit" aria-label="Giảm số lượng">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </button>
                                 </form>
 
                                 <form asp-controller="Cart" asp-action="Update" method="post" class="quantity-update-form js-cart-action-form">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@item.ProductId" />
                                     <input class="cart-qty-input js-cart-qty-input" type="number" name="quantity" value="@item.Quantity" min="0" max="99" aria-label="Số lượng @item.ProductName" />
-                                    <button class="qty-save" type="submit">Cập nhật</button>
                                 </form>
 
                                 <form asp-controller="Cart" asp-action="Increase" method="post" class="js-cart-action-form">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@item.ProductId" />
-                                    <button class="qty-btn" type="submit" aria-label="Tăng số lượng"><i class="fa-solid fa-plus"></i></button>
+                                    <button class="qty-btn" type="submit" aria-label="Tăng số lượng">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
                                 </form>
                             </div>
 
@@ -82,7 +87,9 @@
                             <form asp-controller="Cart" asp-action="Remove" method="post" class="remove-form js-cart-action-form">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.ProductId" />
-                                <button class="remove-btn" type="submit" aria-label="Xóa @item.ProductName"><i class="fa-solid fa-trash-can"></i></button>
+                                <button class="remove-btn" type="submit" aria-label="Xóa @item.ProductName">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
                             </form>
                         </article>
                     }
@@ -107,11 +114,15 @@
                         <strong class="js-summary-total">@total.ToString("N0") đ</strong>
                     </div>
 
-                    <button class="btn btn-primary-custom w-100" type="button"><i class="fa-solid fa-credit-card me-1"></i> Thanh toán</button>
+                    <button class="btn btn-primary-custom w-100" type="button">
+                        <i class="fa-solid fa-credit-card me-1"></i> Thanh toán
+                    </button>
 
                     <form asp-controller="Cart" asp-action="Clear" method="post" class="clear-cart-form">
                         @Html.AntiForgeryToken()
-                        <button class="btn btn-outline-danger w-100" type="submit"><i class="fa-solid fa-trash-can me-1"></i> Xóa toàn bộ giỏ</button>
+                        <button class="btn btn-outline-danger w-100" type="submit">
+                            <i class="fa-solid fa-trash-can me-1"></i> Xóa toàn bộ giỏ
+                        </button>
                     </form>
 
                     <div class="cart-note">

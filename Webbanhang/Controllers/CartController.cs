@@ -10,6 +10,7 @@ namespace Webbanhang.Controllers
     public class CartController : Controller
     {
         private const string CartSessionKey = "SHOPPING_CART";
+        private const int MaxCartQuantity = 5;
 
         public IActionResult Index()
         {
@@ -26,8 +27,26 @@ namespace Webbanhang.Controllers
                 return NotFound();
             }
 
-            quantity = Math.Clamp(quantity, 1, 99);
             var cart = GetCart();
+            var currentTotal = GetCartQuantity(cart);
+            var availableQuantity = MaxCartQuantity - currentTotal;
+            var requestedQuantity = Math.Clamp(quantity, 1, MaxCartQuantity);
+
+            string message;
+            if (availableQuantity <= 0)
+            {
+                message = $"Giỏ hàng chỉ được chứa tối đa {MaxCartQuantity} sản phẩm.";
+                TempData["CartMessage"] = message;
+
+                if (IsAjaxRequest())
+                {
+                    return Json(new { message, count = currentTotal });
+                }
+
+                return RedirectToLocalCartTarget(returnUrl);
+            }
+
+            var quantityToAdd = Math.Min(requestedQuantity, availableQuantity);
             var item = cart.FirstOrDefault(i => i.ProductId == id);
 
             if (item == null)
@@ -38,30 +57,26 @@ namespace Webbanhang.Controllers
                     ProductName = product.Name,
                     Price = product.Price,
                     ImageUrl = product.ImageUrl,
-                    Quantity = quantity
+                    Quantity = quantityToAdd
                 });
             }
             else
             {
-                item.Quantity = Math.Clamp(item.Quantity + quantity, 1, 99);
+                item.Quantity += quantityToAdd;
             }
 
             SaveCart(cart);
-            var message = $"Đã thêm {product.Name} vào giỏ hàng.";
+            message = quantityToAdd < requestedQuantity
+                ? $"Đã thêm {quantityToAdd} sản phẩm. Giỏ hàng đã đạt giới hạn {MaxCartQuantity} sản phẩm."
+                : $"Đã thêm {product.Name} vào giỏ hàng.";
             TempData["CartMessage"] = message;
 
             if (IsAjaxRequest())
             {
-                var count = cart.Sum(cartItem => cartItem.Quantity);
-                return Json(new { message, count });
+                return Json(new { message, count = GetCartQuantity(cart) });
             }
 
-            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-
-            return RedirectToAction(nameof(Index));
+            return RedirectToLocalCartTarget(returnUrl);
         }
 
         [HttpPost]
@@ -70,26 +85,41 @@ namespace Webbanhang.Controllers
         {
             var cart = GetCart();
             var item = cart.FirstOrDefault(i => i.ProductId == id);
+            var message = string.Empty;
 
             if (item != null)
             {
                 if (quantity <= 0)
                 {
                     cart.Remove(item);
-                    TempData["CartMessage"] = "Đã xóa sản phẩm khỏi giỏ hàng.";
+                    message = "Đã xóa sản phẩm khỏi giỏ hàng.";
                 }
                 else
                 {
-                    item.Quantity = Math.Clamp(quantity, 1, 99);
-                    TempData["CartMessage"] = "Đã cập nhật số lượng sản phẩm.";
+                    var otherItemsTotal = cart.Where(cartItem => cartItem.ProductId != id).Sum(cartItem => cartItem.Quantity);
+                    var maxAllowedForItem = Math.Max(MaxCartQuantity - otherItemsTotal, 0);
+                    item.Quantity = Math.Min(quantity, maxAllowedForItem);
+
+                    if (item.Quantity <= 0)
+                    {
+                        cart.Remove(item);
+                        message = $"Giỏ hàng đã đạt giới hạn {MaxCartQuantity} sản phẩm.";
+                    }
+                    else
+                    {
+                        message = quantity > maxAllowedForItem
+                            ? $"Số lượng đã được giới hạn để tổng giỏ hàng không vượt {MaxCartQuantity} sản phẩm."
+                            : "Đã cập nhật số lượng sản phẩm.";
+                    }
                 }
 
                 SaveCart(cart);
+                TempData["CartMessage"] = message;
             }
 
             if (IsAjaxRequest())
             {
-                return CartJson(cart, id);
+                return CartJson(cart, id, message);
             }
 
             return RedirectToAction(nameof(Index));
@@ -101,16 +131,27 @@ namespace Webbanhang.Controllers
         {
             var cart = GetCart();
             var item = cart.FirstOrDefault(i => i.ProductId == id);
+            var message = string.Empty;
 
             if (item != null)
             {
-                item.Quantity = Math.Clamp(item.Quantity + 1, 1, 99);
-                SaveCart(cart);
+                if (GetCartQuantity(cart) >= MaxCartQuantity)
+                {
+                    message = $"Giỏ hàng chỉ được chứa tối đa {MaxCartQuantity} sản phẩm.";
+                }
+                else
+                {
+                    item.Quantity++;
+                    SaveCart(cart);
+                    message = "Đã tăng số lượng sản phẩm.";
+                }
+
+                TempData["CartMessage"] = message;
             }
 
             if (IsAjaxRequest())
             {
-                return CartJson(cart, id);
+                return CartJson(cart, id, message);
             }
 
             return RedirectToAction(nameof(Index));
@@ -148,17 +189,19 @@ namespace Webbanhang.Controllers
         {
             var cart = GetCart();
             var item = cart.FirstOrDefault(i => i.ProductId == id);
+            var message = string.Empty;
 
             if (item != null)
             {
                 cart.Remove(item);
                 SaveCart(cart);
-                TempData["CartMessage"] = "Đã xóa sản phẩm khỏi giỏ hàng.";
+                message = "Đã xóa sản phẩm khỏi giỏ hàng.";
+                TempData["CartMessage"] = message;
             }
 
             if (IsAjaxRequest())
             {
-                return CartJson(cart, id);
+                return CartJson(cart, id, message);
             }
 
             return RedirectToAction(nameof(Index));
@@ -183,12 +226,27 @@ namespace Webbanhang.Controllers
             HttpContext.Session.SetJson(CartSessionKey, cart);
         }
 
+        private IActionResult RedirectToLocalCartTarget(string? returnUrl)
+        {
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         private bool IsAjaxRequest()
         {
             return Request.Headers["X-Requested-With"] == "XMLHttpRequest";
         }
 
-        private JsonResult CartJson(List<CartItem> cart, int changedProductId)
+        private static int GetCartQuantity(List<CartItem> cart)
+        {
+            return cart.Sum(item => item.Quantity);
+        }
+
+        private JsonResult CartJson(List<CartItem> cart, int changedProductId, string? message = null)
         {
             var subTotal = cart.Sum(item => item.LineTotal);
             var shippingFee = subTotal > 0 ? 30000 : 0;
@@ -199,8 +257,9 @@ namespace Webbanhang.Controllers
             return Json(new
             {
                 isEmpty = !cart.Any(),
-                count = cart.Sum(item => item.Quantity),
+                count = GetCartQuantity(cart),
                 changedProductId,
+                message,
                 item = changedItem == null ? null : new
                 {
                     quantity = changedItem.Quantity,

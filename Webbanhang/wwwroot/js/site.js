@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     imagePasteBoxes.forEach((box) => setupImagePasteBox(box));
     setupCartActionForms();
+    setupCartQuantityInputs();
 
     const addToCartForms = document.querySelectorAll(".add-cart-form, .detail-cart-form");
     addToCartForms.forEach((form) => {
@@ -264,9 +265,43 @@ const setupCartActionForms = () => {
     });
 };
 
+const setupCartQuantityInputs = () => {
+    const inputs = document.querySelectorAll(".js-cart-qty-input");
+
+    inputs.forEach((input) => {
+        input.dataset.lastValue = input.value;
+
+        input.addEventListener("change", () => submitQuantityInput(input));
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                input.blur();
+                submitQuantityInput(input);
+            }
+        });
+    });
+};
+
+const submitQuantityInput = (input) => {
+    const value = Number.parseInt(input.value, 10);
+    const normalizedValue = Number.isFinite(value) ? Math.min(Math.max(value, 0), 99) : 1;
+    input.value = normalizedValue.toString();
+
+    if (input.dataset.lastValue === input.value) {
+        return;
+    }
+
+    input.dataset.lastValue = input.value;
+    input.closest("form")?.requestSubmit();
+};
+
 const updateCartUi = (data, cartPage) => {
     if (!data) {
         return;
+    }
+
+    if (data.message) {
+        showAlert(null, data.message);
     }
 
     const cartCount = document.querySelector(".cart-count");
@@ -290,6 +325,7 @@ const updateCartUi = (data, cartPage) => {
 
         if (quantityInput) {
             quantityInput.value = data.item.quantity;
+            quantityInput.dataset.lastValue = data.item.quantity.toString();
         }
 
         if (lineTotal) {
