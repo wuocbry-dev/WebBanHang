@@ -1,7 +1,12 @@
+@using Webbanhang.Models
 @model IEnumerable<Webbanhang.Models.Product>
 @{
     ViewData["Title"] = "Trang chủ";
-    var featured = Model.FirstOrDefault();
+    var products = Model.ToList();
+    var featured = products.FirstOrDefault();
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var isAdmin = User.IsInRole(AppRoles.Admin);
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}#san-pham";
 }
 
 <section class="hero-section">
@@ -12,11 +17,21 @@
             <p>Thiết kế tinh gọn, sản phẩm nổi bật và trải nghiệm mượt mà trên mọi màn hình.</p>
             <div class="hero-actions">
                 <a class="btn btn-primary-custom" href="#san-pham">Xem sản phẩm</a>
-                <a class="btn btn-outline-custom" asp-controller="Cart" asp-action="Index"><i class="fa-solid fa-cart-shopping me-1"></i> Xem giỏ hàng</a>
-                <a class="btn btn-outline-custom" asp-controller="Products" asp-action="Index"><i class="fa-solid fa-boxes-stacked me-1"></i> Quản lý sản phẩm</a>
+                @if (isLoggedIn)
+                {
+                    <a class="btn btn-outline-custom" asp-controller="Cart" asp-action="Index"><i class="fa-solid fa-cart-shopping me-1"></i> Xem giỏ hàng</a>
+                }
+                else
+                {
+                    <a class="btn btn-outline-custom" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl"><i class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập để mua hàng</a>
+                }
+                @if (isAdmin)
+                {
+                    <a class="btn btn-outline-custom" asp-controller="Products" asp-action="Index"><i class="fa-solid fa-boxes-stacked me-1"></i> Quản lý sản phẩm</a>
+                }
             </div>
             <div class="hero-stats">
-                <div><strong>12</strong><span>Sản phẩm</span></div>
+                <div><strong>@products.Count</strong><span>Sản phẩm</span></div>
                 <div><strong>4.9</strong><span>Đánh giá</span></div>
                 <div><strong>24h</strong><span>Hỗ trợ</span></div>
             </div>
@@ -52,13 +67,13 @@
     <div class="section-heading">
         <div>
             <span class="eyebrow dark"><i class="fa-solid fa-layer-group"></i> Danh sách sản phẩm</span>
-            <h2>12 sản phẩm nổi bật</h2>
+            <h2>@products.Count sản phẩm nổi bật</h2>
         </div>
     </div>
 
     <div class="shop-grid">
         <div class="product-list">
-            @foreach (var product in Model)
+            @foreach (var product in products)
             {
                 <article class="product-card">
                     <a class="product-image" asp-controller="Home" asp-action="Details" asp-route-id="@product.Id" aria-label="Xem @product.Name">
@@ -81,15 +96,24 @@
                         </div>
                         <div class="card-actions">
                             <a class="btn-buy" asp-controller="Home" asp-action="Details" asp-route-id="@product.Id">Chi tiết</a>
-                            <form asp-controller="Cart" asp-action="Add" method="post" class="add-cart-form">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@product.Id" />
-                                <input type="hidden" name="quantity" value="1" />
-                                <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString#san-pham" />
-                                <button class="btn-icon" type="submit" aria-label="Thêm @product.Name vào giỏ hàng">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                </button>
-                            </form>
+                            @if (isLoggedIn)
+                            {
+                                <form asp-controller="Cart" asp-action="Add" method="post" class="add-cart-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@product.Id" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                    <button class="btn-icon" type="submit" aria-label="Thêm @product.Name vào giỏ hàng">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a class="btn-icon login-cart-link" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl" aria-label="Đăng nhập để thêm @product.Name vào giỏ hàng">
+                                    <i class="fa-solid fa-lock"></i>
+                                </a>
+                            }
                         </div>
                     </div>
                 </article>
@@ -106,16 +130,16 @@
                 <a href="#"><i class="fa-brands fa-linkedin-in"></i> LinkedIn</a>
             </div>
 
-<div class="sidebar-card benefit-card">
-    <h3>Ưu điểm mua hàng</h3>
-    <ul>
-        <li><i class="fa-solid fa-circle-check"></i> Sản phẩm chất lượng, giá cả hợp lý</li>
-        <li><i class="fa-solid fa-circle-check"></i> Dễ dàng chọn mua và đặt hàng nhanh chóng</li>
-        <li><i class="fa-solid fa-circle-check"></i> Hỗ trợ nhiều sản phẩm đa dạng</li>
-        <li><i class="fa-solid fa-circle-check"></i> Giao diện mua sắm thân thiện, dễ sử dụng</li>
-        <li><i class="fa-solid fa-circle-check"></i> Phù hợp trên cả máy tính và điện thoại</li>
-    </ul>
-</div>
+            <div class="sidebar-card benefit-card">
+                <h3>Ưu điểm mua hàng</h3>
+                <ul>
+                    <li><i class="fa-solid fa-circle-check"></i> Sản phẩm chất lượng, giá cả hợp lý</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Đăng nhập để thêm sản phẩm vào giỏ hàng</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Hỗ trợ nhiều sản phẩm đa dạng</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Giao diện mua sắm thân thiện, dễ sử dụng</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Phù hợp trên cả máy tính và điện thoại</li>
+                </ul>
+            </div>
         </aside>
     </div>
 </section>

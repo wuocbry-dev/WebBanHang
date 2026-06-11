@@ -4,7 +4,8 @@
     var isLoggedIn = User.Identity?.IsAuthenticated == true;
     var signedInUser = isLoggedIn ? await UserManager.GetUserAsync(User) : null;
     var currentUserName = signedInUser?.FullName ?? User.Identity?.Name;
-    var currentRole = User.IsInRole(AppRoles.Admin) ? AppRoles.Admin : User.IsInRole(AppRoles.Customer) ? AppRoles.Customer : string.Empty;
+    var isAdmin = User.IsInRole(AppRoles.Admin);
+    var currentRole = isAdmin ? AppRoles.Admin : User.IsInRole(AppRoles.Customer) ? AppRoles.Customer : string.Empty;
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
 }
 <!DOCTYPE html>
@@ -12,7 +13,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Trang Web Bán Hàng</title>
+    <title>@ViewData["Title"] - SmartStore</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,7 +28,7 @@
             <div class="container">
                 <a class="navbar-brand brand-logo" asp-controller="Home" asp-action="Index">
                     <span class="brand-icon"><i class="fa-solid fa-bag-shopping"></i></span>
-                    <span>Web Bán Hàng</span>
+                    <span>SmartStore</span>
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu" aria-controls="mainMenu" aria-expanded="false" aria-label="Mở menu">
@@ -43,19 +44,23 @@
                             <a class="nav-link" href="/#san-pham">Sản phẩm</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Cart" asp-action="Index">Giỏ hàng</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Products" asp-action="Index">Quản lý sản phẩm</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Contact">Liên hệ</a>
                         </li>
-                        <li class="nav-item ms-lg-2">
-                            @await Component.InvokeAsync("CartSummary")
-                        </li>
+
+                        @if (isAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-admin" asp-controller="Products" asp-action="Index">
+                                    <i class="fa-solid fa-boxes-stacked me-1"></i> Quản lý sản phẩm
+                                </a>
+                            </li>
+                        }
+
                         @if (isLoggedIn)
                         {
+                            <li class="nav-item ms-lg-2">
+                                @await Component.InvokeAsync("CartSummary")
+                            </li>
                             <li class="nav-item">
                                 <span class="nav-user">
                                     <i class="fa-solid fa-circle-user"></i>
@@ -74,7 +79,7 @@
                         }
                         else
                         {
-                            <li class="nav-item">
+                            <li class="nav-item ms-lg-2">
                                 <a class="btn-nav btn-nav-light" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">
                                     <i class="fa-solid fa-right-to-bracket"></i>
                                     <span>Đăng nhập</span>
@@ -113,15 +118,21 @@
     <footer class="site-footer">
         <div class="container footer-grid">
             <div class="footer-col">
-                <h3>Web Bán Hàng</h3>
+                <h3>SmartStore</h3>
                 <p>Giao diện bán hàng hiện đại, dễ dùng và responsive.</p>
             </div>
             <div class="footer-col">
                 <h3>Liên kết</h3>
                 <a asp-controller="Home" asp-action="Index">Trang chủ</a>
                 <a href="/#san-pham">Sản phẩm</a>
-                <a asp-controller="Cart" asp-action="Index">Giỏ hàng</a>
-                <a asp-controller="Products" asp-action="Index">Quản lý sản phẩm</a>
+                @if (isLoggedIn)
+                {
+                    <a asp-controller="Cart" asp-action="Index">Giỏ hàng</a>
+                }
+                @if (isAdmin)
+                {
+                    <a asp-controller="Products" asp-action="Index">Quản lý sản phẩm</a>
+                }
                 <a asp-controller="Home" asp-action="Contact">Liên hệ</a>
             </div>
             <div class="footer-col">
@@ -134,7 +145,7 @@
                 </div>
             </div>
         </div>
-        <div class="footer-bottom">© 2026 Web Bán Hàng. Thiết kế tối ưu trải nghiệm người dùng.</div>
+        <div class="footer-bottom">© 2026 SmartStore. Thiết kế tối ưu trải nghiệm người dùng.</div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

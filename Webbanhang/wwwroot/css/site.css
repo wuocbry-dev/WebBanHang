@@ -494,11 +494,24 @@ img {
   height: 42px;
   border: 1px solid var(--border);
   border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--primary-dark);
   background: #eef2ff;
 }
 
 .btn-icon:hover {
+  background: #e0e7ff;
+}
+
+.login-cart-link {
+  color: #64748b;
+  background: #f1f5f9;
+}
+
+.login-cart-link:hover {
+  color: var(--primary-dark);
   background: #e0e7ff;
 }
 
@@ -691,6 +704,47 @@ img {
   gap: 12px;
 }
 
+.login-required-card {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.login-required-card > i {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  color: var(--primary-dark);
+  background: #eef2ff;
+}
+
+.login-required-card strong,
+.login-required-card span {
+  display: block;
+}
+
+.login-required-card strong {
+  color: var(--dark);
+  font-weight: 900;
+}
+
+.login-required-card span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
 .site-footer {
   color: #e5e7eb;
   background: #111827;
@@ -826,6 +880,15 @@ img {
   .detail-image-card img {
     width: 100%;
     height: min(700px, calc(100vw - 56px));
+  }
+
+  .login-required-card {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .login-required-card .btn {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 
   .image-paste-box {

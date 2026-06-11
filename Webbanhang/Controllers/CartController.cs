@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using Webbanhang.Extensions;
@@ -5,6 +6,7 @@ using Webbanhang.Models;
 
 namespace Webbanhang.Controllers
 {
+    [Authorize]
     public class CartController : Controller
     {
         private const string CartSessionKey = "SHOPPING_CART";
@@ -50,7 +52,7 @@ namespace Webbanhang.Controllers
 
             if (IsAjaxRequest())
             {
-                var count = cart.Sum(item => item.Quantity);
+                var count = cart.Sum(cartItem => cartItem.Quantity);
                 return Json(new { message, count });
             }
 

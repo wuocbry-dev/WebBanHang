@@ -1,6 +1,8 @@
 @model Webbanhang.Models.Product
 @{
     ViewData["Title"] = Model.Name;
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
 }
 
 <section class="detail-section">
@@ -11,7 +13,7 @@
         </div>
 
         <div class="detail-content">
-            <a class="back-link" asp-controller="Home" asp-action="Index"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách</a>
+            <a class="back-link" asp-controller="Home" asp-action="Index" asp-fragment="san-pham"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách</a>
             <span class="eyebrow dark">@Model.Category</span>
             <h1>@Model.Name</h1>
             <div class="detail-rating">
@@ -35,17 +37,31 @@
                 <div><i class="fa-solid fa-box-open"></i><span>@Model.StockStatus</span></div>
             </div>
 
-            <form asp-controller="Cart" asp-action="Add" method="post" class="detail-cart-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@Model.Id" />
-                <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                <label for="quantity" class="quantity-label">Số lượng</label>
-                <div class="detail-actions detail-cart-actions">
-                    <input class="quantity-input" id="quantity" name="quantity" type="number" value="1" min="1" max="99" />
-                    <button class="btn btn-primary-custom" type="submit"><i class="fa-solid fa-cart-plus me-1"></i> Thêm vào giỏ</button>
-                    <a class="btn btn-outline-custom" asp-controller="Cart" asp-action="Index">Xem giỏ hàng</a>
+            @if (isLoggedIn)
+            {
+                <form asp-controller="Cart" asp-action="Add" method="post" class="detail-cart-form">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                    <label for="quantity" class="quantity-label">Số lượng</label>
+                    <div class="detail-actions detail-cart-actions">
+                        <input class="quantity-input" id="quantity" name="quantity" type="number" value="1" min="1" max="99" />
+                        <button class="btn btn-primary-custom" type="submit"><i class="fa-solid fa-cart-plus me-1"></i> Thêm vào giỏ</button>
+                        <a class="btn btn-outline-custom" asp-controller="Cart" asp-action="Index">Xem giỏ hàng</a>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="login-required-card">
+                    <i class="fa-solid fa-lock"></i>
+                    <div>
+                        <strong>Đăng nhập để thêm sản phẩm vào giỏ hàng</strong>
+                        <span>Tài khoản giúp lưu giỏ hàng và tiếp tục mua sắm an toàn hơn.</span>
+                    </div>
+                    <a class="btn btn-primary-custom" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">Đăng nhập</a>
                 </div>
-            </form>
+            }
         </div>
     </div>
 </section>
