@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     window.requestAnimationFrame(() => document.body.classList.add("is-page-ready"));
 
     const autoDismissDelay = 3000;
+    movePageAlertsToToastContainer();
+
     const alerts = document.querySelectorAll(".alert");
     const vndInputs = document.querySelectorAll(".js-vnd-input");
     const imagePasteBoxes = document.querySelectorAll(".js-image-paste-box");
@@ -85,6 +87,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+const movePageAlertsToToastContainer = () => {
+    const pageAlerts = document.querySelectorAll(".cart-alert:not(.toast-alert)");
+    if (!pageAlerts.length) {
+        return;
+    }
+
+    const container = getToastContainer();
+    pageAlerts.forEach((alert) => {
+        alert.classList.add("toast-alert");
+        container.appendChild(alert);
+    });
+};
 
 const dismissAlert = (alert) => {
     if (!alert || alert.classList.contains("is-dismissed")) {
