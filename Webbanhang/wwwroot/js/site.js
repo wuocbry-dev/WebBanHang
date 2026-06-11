@@ -3,6 +3,8 @@
 
 // Write your JavaScript code.
 document.addEventListener("DOMContentLoaded", () => {
+    window.requestAnimationFrame(() => document.body.classList.add("is-page-ready"));
+
     const autoDismissDelay = 3000;
     const alerts = document.querySelectorAll(".alert");
     const vndInputs = document.querySelectorAll(".js-vnd-input");
@@ -16,12 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.setTimeout(() => dismissAlert(alert), autoDismissDelay);
     });
-
-    const savedScrollPosition = sessionStorage.getItem("scrollPosition");
-    if (savedScrollPosition) {
-        window.scrollTo(0, Number.parseInt(savedScrollPosition, 10));
-        sessionStorage.removeItem("scrollPosition");
-    }
 
     vndInputs.forEach((input) => {
         formatVndInput(input);
@@ -50,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     imagePasteBoxes.forEach((box) => setupImagePasteBox(box));
+    setupCartActionForms();
 
     const addToCartForms = document.querySelectorAll(".add-cart-form, .detail-cart-form");
     addToCartForms.forEach((form) => {
@@ -206,9 +203,113 @@ const setupImagePasteBox = (box) => {
     fileInput?.addEventListener("change", () => setImage(fileInput.files?.[0]));
 };
 
-window.addEventListener("beforeunload", () => {
-    sessionStorage.setItem("scrollPosition", window.scrollY.toString());
-});
+const setupCartActionForms = () => {
+    const forms = document.querySelectorAll(".js-cart-action-form");
+
+    forms.forEach((form) => {
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            if (form.classList.contains("is-loading")) {
+                return;
+            }
+
+            const cartItem = form.closest(".js-cart-item");
+            const cartPage = form.closest(".js-cart-page");
+            const submitButtons = cartItem?.querySelectorAll("button") ?? form.querySelectorAll("button");
+
+            form.classList.add("is-loading");
+            cartItem?.classList.add("is-updating");
+            submitButtons.forEach((button) => button.disabled = true);
+
+            try {
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: new FormData(form),
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+
+                if (!response.ok) {
+                    HTMLFormElement.prototype.submit.call(form);
+                    return;
+                }
+
+                const data = await response.json();
+                updateCartUi(data, cartPage);
+            } catch {
+                HTMLFormElement.prototype.submit.call(form);
+            } finally {
+                form.classList.remove("is-loading");
+                cartItem?.classList.remove("is-updating");
+                submitButtons.forEach((button) => button.disabled = false);
+            }
+        });
+    });
+};
+
+const updateCartUi = (data, cartPage) => {
+    if (!data) {
+        return;
+    }
+
+    const cartCount = document.querySelector(".cart-count");
+    if (cartCount && Number.isFinite(data.count)) {
+        cartCount.textContent = data.count;
+    }
+
+    if (data.summary) {
+        setText(".js-summary-subtotal", data.summary.subTotal);
+        setText(".js-summary-shipping", data.summary.shippingFee);
+        setText(".js-summary-discount", data.summary.discount);
+        setText(".js-summary-total", data.summary.total);
+    }
+
+    const productId = data.changedProductId?.toString();
+    const row = productId ? document.querySelector(`.js-cart-item[data-product-id="${productId}"]`) : null;
+
+    if (data.item && row) {
+        const quantityInput = row.querySelector(".js-cart-qty-input");
+        const lineTotal = row.querySelector(".js-line-total");
+
+        if (quantityInput) {
+            quantityInput.value = data.item.quantity;
+        }
+
+        if (lineTotal) {
+            lineTotal.textContent = data.item.lineTotal;
+            lineTotal.classList.add("is-value-updated");
+            window.setTimeout(() => lineTotal.classList.remove("is-value-updated"), 280);
+        }
+
+        return;
+    }
+
+    if (row) {
+        row.classList.add("is-removing");
+        window.setTimeout(() => {
+            row.remove();
+            if (data.isEmpty || !cartPage?.querySelector(".js-cart-item")) {
+                window.location.reload();
+            }
+        }, 180);
+        return;
+    }
+
+    if (data.isEmpty) {
+        window.location.reload();
+    }
+};
+
+const setText = (selector, value) => {
+    const element = document.querySelector(selector);
+    if (element && value !== undefined && value !== null) {
+        element.textContent = value;
+        element.classList.add("is-value-updated");
+        window.setTimeout(() => element.classList.remove("is-value-updated"), 280);
+    }
+};
 
 const showAlert = (_form, message) => {
     const container = getToastContainer();

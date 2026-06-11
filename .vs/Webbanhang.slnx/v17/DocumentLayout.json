@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\GitHup-wuocbry-dev\\WebBanHang\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|Webbanhang\\Webbanhang.csproj|d:\\githup-wuocbry-dev\\webbanhang\\webbanhang\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|Webbanhang\\Webbanhang.csproj|solutionrelative:webbanhang\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|Webbanhang\\Webbanhang.csproj|d:\\githup-wuocbry-dev\\webbanhang\\webbanhang\\views\\products\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|Webbanhang\\Webbanhang.csproj|solutionrelative:webbanhang\\views\\products\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "site.css",
+              "DocumentMoniker": "D:\\GitHup-wuocbry-dev\\WebBanHang\\Webbanhang\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "Webbanhang\\wwwroot\\css\\site.css",
+              "ToolTip": "D:\\GitHup-wuocbry-dev\\WebBanHang\\Webbanhang\\wwwroot\\css\\site.css",
+              "RelativeToolTip": "Webbanhang\\wwwroot\\css\\site.css",
+              "ViewState": "AgIAAO0AAAAAAAAAAAAEwPUAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-05-28T09:21:23.703Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "D:\\GitHup-wuocbry-dev\\WebBanHang\\Webbanhang\\Views\\Products\\Create.cshtml",
+              "RelativeDocumentMoniker": "Webbanhang\\Views\\Products\\Create.cshtml",
+              "ToolTip": "D:\\GitHup-wuocbry-dev\\WebBanHang\\Webbanhang\\Views\\Products\\Create.cshtml",
+              "RelativeToolTip": "Webbanhang\\Views\\Products\\Create.cshtml",
+              "ViewState": "AgIAACcAAAAAAAAAAAArwCcAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-28T09:20:47.425Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

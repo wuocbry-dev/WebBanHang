@@ -1,3 +1,12 @@
+@using Webbanhang.Models
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
+@{
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var signedInUser = isLoggedIn ? await UserManager.GetUserAsync(User) : null;
+    var currentUserName = signedInUser?.FullName ?? User.Identity?.Name;
+    var currentRole = User.IsInRole(AppRoles.Admin) ? AppRoles.Admin : User.IsInRole(AppRoles.Customer) ? AppRoles.Customer : string.Empty;
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -45,11 +54,57 @@
                         <li class="nav-item ms-lg-2">
                             @await Component.InvokeAsync("CartSummary")
                         </li>
+                        @if (isLoggedIn)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-user">
+                                    <i class="fa-solid fa-circle-user"></i>
+                                    <span>@currentUserName@if (!string.IsNullOrWhiteSpace(currentRole)) { <small>@currentRole</small> }</span>
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="nav-auth-form">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-nav btn-nav-light">
+                                        <i class="fa-solid fa-right-from-bracket"></i>
+                                        <span>Đăng xuất</span>
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn-nav btn-nav-light" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">
+                                    <i class="fa-solid fa-right-to-bracket"></i>
+                                    <span>Đăng nhập</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn-nav" asp-controller="Account" asp-action="Register">
+                                    <i class="fa-solid fa-user-plus"></i>
+                                    <span>Đăng ký</span>
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
+    @if (TempData["AuthMessage"] != null)
+    {
+        <div class="container auth-toast-wrap">
+            <div class="alert alert-success cart-alert" role="alert">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>@TempData["AuthMessage"]</span>
+                <button type="button" class="alert-close" aria-label="Đóng thông báo">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+    }
 
     <main role="main">
         @RenderBody()

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using Webbanhang.Extensions;
 using Webbanhang.Models;
 
@@ -84,6 +85,11 @@ namespace Webbanhang.Controllers
                 SaveCart(cart);
             }
 
+            if (IsAjaxRequest())
+            {
+                return CartJson(cart, id);
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -98,6 +104,11 @@ namespace Webbanhang.Controllers
             {
                 item.Quantity = Math.Clamp(item.Quantity + 1, 1, 99);
                 SaveCart(cart);
+            }
+
+            if (IsAjaxRequest())
+            {
+                return CartJson(cart, id);
             }
 
             return RedirectToAction(nameof(Index));
@@ -121,6 +132,11 @@ namespace Webbanhang.Controllers
                 SaveCart(cart);
             }
 
+            if (IsAjaxRequest())
+            {
+                return CartJson(cart, id);
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -136,6 +152,11 @@ namespace Webbanhang.Controllers
                 cart.Remove(item);
                 SaveCart(cart);
                 TempData["CartMessage"] = "Đã xóa sản phẩm khỏi giỏ hàng.";
+            }
+
+            if (IsAjaxRequest())
+            {
+                return CartJson(cart, id);
             }
 
             return RedirectToAction(nameof(Index));
@@ -163,6 +184,39 @@ namespace Webbanhang.Controllers
         private bool IsAjaxRequest()
         {
             return Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+        }
+
+        private JsonResult CartJson(List<CartItem> cart, int changedProductId)
+        {
+            var subTotal = cart.Sum(item => item.LineTotal);
+            var shippingFee = subTotal > 0 ? 30000 : 0;
+            var discount = subTotal >= 500000 ? 50000 : 0;
+            var total = subTotal + shippingFee - discount;
+            var changedItem = cart.FirstOrDefault(item => item.ProductId == changedProductId);
+
+            return Json(new
+            {
+                isEmpty = !cart.Any(),
+                count = cart.Sum(item => item.Quantity),
+                changedProductId,
+                item = changedItem == null ? null : new
+                {
+                    quantity = changedItem.Quantity,
+                    lineTotal = FormatCurrency(changedItem.LineTotal)
+                },
+                summary = new
+                {
+                    subTotal = FormatCurrency(subTotal),
+                    shippingFee = FormatCurrency(shippingFee),
+                    discount = $"-{FormatCurrency(discount)}",
+                    total = FormatCurrency(total)
+                }
+            });
+        }
+
+        private static string FormatCurrency(decimal value)
+        {
+            return $"{value.ToString("N0", CultureInfo.InvariantCulture)} đ";
         }
     }
 }

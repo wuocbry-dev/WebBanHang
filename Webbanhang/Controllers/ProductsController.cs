@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Webbanhang.Models;
 
 namespace Webbanhang.Controllers
 {
+    [Authorize(Roles = AppRoles.Admin)]
     public class ProductsController : Controller
     {
         public IActionResult Index()
